@@ -10,7 +10,7 @@ Majir helps Claude Code and Cowork find money users already have. The plugin con
 
 ## Installation
 
-Install this plugin from the Claude plugin marketplace after approval, or use the repository directly while testing.
+Install this plugin from the Claude plugin marketplace after approval. For pre-approval testing, use the latest GitHub-verified signed release tag rather than a moving branch, and verify that `.mcp.json` points to `https://mcp.majir.shop/mcp`.
 
 ## Authentication
 
