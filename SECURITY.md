@@ -10,6 +10,8 @@ Please report suspected security issues privately by emailing:
 
 security@majir.shop
 
+You can also use GitHub private vulnerability reporting for this repository.
+
 Please include:
 
 - Repository name
