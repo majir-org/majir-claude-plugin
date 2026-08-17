@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "majir": {
+      "type": "http",
+      "url": "https://mcp.majir.shop/mcp"
+    }
+  }
+}

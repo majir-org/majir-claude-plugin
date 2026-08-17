@@ -1,0 +1,19 @@
+{
+  "name": "majir",
+  "version": "1.0.0",
+  "description": "Find money you already have with Majir current deals and saved offers.",
+  "author": {
+    "name": "Majir Inc.",
+    "url": "https://majirshop.com"
+  },
+  "homepage": "https://developers.majir.shop/mcp",
+  "repository": "https://github.com/majir-org/majir-claude-plugin",
+  "license": "MIT",
+  "keywords": [
+    "mcp",
+    "savings",
+    "offers",
+    "promo-codes",
+    "cashback"
+  ]
+}
