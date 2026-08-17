@@ -1,0 +1,73 @@
+name: Security Hygiene
+
+on:
+  pull_request:
+    branches:
+      - founders-branch
+      - develop
+      - main
+    paths:
+      - ".gitignore"
+      - ".github/workflows/security-hygiene.yml"
+      - ".claude-plugin/**"
+      - ".mcp.json"
+      - "skills/**"
+      - "README.md"
+      - "SECURITY.md"
+  push:
+    tags:
+      - "majir--v*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  hygiene:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check critical files remain trackable
+        run: |
+          set -euo pipefail
+
+          if git check-ignore --no-index -q .claude-plugin/plugin.json; then
+            echo "::error::.claude-plugin/plugin.json is ignored by .gitignore"
+            git check-ignore -v --no-index .claude-plugin/plugin.json || true
+            exit 1
+          fi
+
+          if git check-ignore --no-index -q .env.example; then
+            echo "::error::.env.example is ignored by .gitignore"
+            git check-ignore -v --no-index .env.example || true
+            exit 1
+          fi
+
+      - name: Check release tag is signed
+        if: startsWith(github.ref, 'refs/tags/majir--v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          ref_json="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${GITHUB_REF_NAME}")"
+          object_type="$(printf '%s' "$ref_json" | jq -r '.object.type')"
+          object_sha="$(printf '%s' "$ref_json" | jq -r '.object.sha')"
+
+          if [ "$object_type" != "tag" ]; then
+            echo "::error::${GITHUB_REF_NAME} must be an annotated signed tag"
+            exit 1
+          fi
+
+          verification_json="$(gh api "repos/${GITHUB_REPOSITORY}/git/tags/${object_sha}")"
+          verified="$(printf '%s' "$verification_json" | jq -r '.verification.verified')"
+          reason="$(printf '%s' "$verification_json" | jq -r '.verification.reason')"
+
+          if [ "$verified" != "true" ]; then
+            echo "::error::${GITHUB_REF_NAME} is not GitHub-verified. Reason: ${reason}"
+            exit 1
+          fi
