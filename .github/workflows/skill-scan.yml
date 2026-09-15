@@ -17,6 +17,7 @@ on:
       - ".claude-plugin/**"
       - ".mcp.json"
       - ".github/workflows/skill-scan.yml"
+      - ".github/scripts/test_skill_scan.py"
 
 permissions:
   contents: read
@@ -35,7 +36,9 @@ jobs:
           python-version: "3.12"
 
       - name: Install Skill Scanner
-        run: python -m pip install --disable-pip-version-check --quiet "cisco-ai-skill-scanner==2.1.0"
+        run: |
+          python .github/scripts/test_skill_scan.py
+          python -m pip install --disable-pip-version-check --quiet "cisco-ai-skill-scanner==2.1.0"
 
       - name: Scan agent skills
         run: |
@@ -63,6 +66,12 @@ jobs:
                   findings.append((str(finding.get("severity") or "UNKNOWN").upper(), finding, str(location)))
           findings.sort(key=lambda item: rank.get(item[0], 5))
 
+          def command_data(value):
+              return str(value).replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+
+          def command_property(value):
+              return command_data(value).replace(":", "%3A").replace(",", "%2C")
+
           lines = ["## Agent skill scan (advisory)", "", f"Skills scanned: {len(results)}", f"Findings: {len(findings)}", ""]
           annotated = 0
           for severity, finding, location in findings:
@@ -72,7 +81,10 @@ jobs:
               # Annotate at most 20 Critical/High findings; the job summary lists all.
               if severity in {"CRITICAL", "HIGH"} and annotated < 20:
                   annotated += 1
-                  print(f"::warning file={location},line={line},title=Skill Scanner {severity} {finding.get('rule_id')}::{title}: {finding.get('description') or ''}")
+                  safe_line = int(line) if str(line).isdigit() and int(line) > 0 else 1
+                  annotation_title = command_property(f"Skill Scanner {severity} {finding.get('rule_id')}")
+                  message = command_data(f"{title}: {finding.get('description') or ''}")
+                  print(f"::warning file={command_property(location)},line={safe_line},title={annotation_title}::{message}")
           with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as handle:
               handle.write("\n".join(lines) + "\n")
           if not results:
