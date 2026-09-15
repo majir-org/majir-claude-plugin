@@ -54,6 +54,32 @@ jobs:
           workspace = Path(sys.argv[2]).resolve()
           rank = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3, "INFO": 4}
           results = report.get("results") or []
+          # Cisco 2.1.0 can exit successfully with skipped skills, analyzer
+          # failures, or metadata-only loader results. Require every input.
+          skills = workspace / "skills"
+          expected = {manifest.parent.resolve() for manifest in skills.rglob("SKILL.md")}
+          scanned = []
+          if not expected or not isinstance(results, list):
+              sys.exit("Skill Scanner has no complete skill inventory.")
+          if (report.get("summary") or {}).get("skills_skipped") or report.get("errors"):
+              sys.exit("Skill Scanner skipped one or more skills.")
+          for result in results:
+              if not isinstance(result, dict) or not isinstance(result.get("skill_path"), str) or not result["skill_path"]:
+                  sys.exit("Skill Scanner returned a result without skill provenance.")
+              scanned.append(Path(result["skill_path"]).resolve())
+              if not result.get("analyzers_used") or result.get("analyzers_failed") or result.get("errors"):
+                  sys.exit("Skill Scanner reported an analyzer failure.")
+              if not isinstance(result.get("findings"), list):
+                  sys.exit("Skill Scanner returned invalid findings.")
+              loader = (result.get("scan_metadata") or {}).get("loader") or {}
+              if loader.get("content_scanned") is False:
+                  sys.exit("Skill Scanner did not scan a skill's content.")
+          if len(scanned) != len(set(scanned)) or set(scanned) != expected:
+              sys.exit("Skill Scanner results do not cover every expected skill exactly once.")
+          # The pinned loader silently omits file contents above this per-file
+          # limit, including helpers in otherwise successful skill results.
+          if any(item.is_file() and item.stat().st_size > 10 * 1024 * 1024 for item in skills.rglob("*")):
+              sys.exit("A skill input exceeds the pinned scanner's 10 MiB per-file limit.")
           findings = []
           for result in results:
               skill_path = Path(result.get("skill_path") or "")
