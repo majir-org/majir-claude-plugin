@@ -1,0 +1,80 @@
+name: Agent skill scan
+
+# Scans the plugin's agent skills with Cisco AI Defense Skill Scanner using local
+# analyzers only: no LLM, VirusTotal, AI Defense API, or other network analyzer,
+# and no API keys or secrets. Findings are advisory. Up to 20 Critical and High
+# findings are annotated on the PR and every finding is listed in the job summary, but
+# findings do not fail the job; it fails only if the scanner cannot scan the
+# skills. Patch Tuesday runs the same scan weekly.
+on:
+  pull_request:
+    branches:
+      - founders-branch
+      - develop
+      - main
+    paths:
+      - "skills/**"
+      - ".claude-plugin/**"
+      - ".mcp.json"
+      - ".github/workflows/skill-scan.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  skill-scanner:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Skill Scanner
+        run: python -m pip install --disable-pip-version-check --quiet "cisco-ai-skill-scanner==2.1.0"
+
+      - name: Scan agent skills
+        run: |
+          set -euo pipefail
+          skill-scanner scan-all skills --recursive --format json --output-json "$RUNNER_TEMP/skill-scan.json" > /dev/null
+          python - "$RUNNER_TEMP/skill-scan.json" "$GITHUB_WORKSPACE" <<'PY'
+          import json
+          import os
+          import sys
+          from pathlib import Path
+
+          report = json.loads(Path(sys.argv[1]).read_text())
+          workspace = Path(sys.argv[2]).resolve()
+          rank = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3, "INFO": 4}
+          results = report.get("results") or []
+          findings = []
+          for result in results:
+              skill_path = Path(result.get("skill_path") or "")
+              for finding in result.get("findings") or []:
+                  location = skill_path / (finding.get("file_path") or "SKILL.md")
+                  try:
+                      location = location.resolve().relative_to(workspace)
+                  except ValueError:
+                      pass
+                  findings.append((str(finding.get("severity") or "UNKNOWN").upper(), finding, str(location)))
+          findings.sort(key=lambda item: rank.get(item[0], 5))
+
+          lines = ["## Agent skill scan (advisory)", "", f"Skills scanned: {len(results)}", f"Findings: {len(findings)}", ""]
+          annotated = 0
+          for severity, finding, location in findings:
+              line = finding.get("line_number") or 1
+              title = finding.get("title") or finding.get("rule_id") or "finding"
+              lines.append(f"- [{severity}] `{location}:{line}` {finding.get('rule_id')}: {title}")
+              # Annotate at most 20 Critical/High findings; the job summary lists all.
+              if severity in {"CRITICAL", "HIGH"} and annotated < 20:
+                  annotated += 1
+                  print(f"::warning file={location},line={line},title=Skill Scanner {severity} {finding.get('rule_id')}::{title}: {finding.get('description') or ''}")
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as handle:
+              handle.write("\n".join(lines) + "\n")
+          if not results:
+              sys.exit("Skill Scanner returned no scanned skills; the skills were not scanned.")
+          PY
