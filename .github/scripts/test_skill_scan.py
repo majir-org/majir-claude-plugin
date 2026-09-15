@@ -27,6 +27,9 @@ class SkillContract(unittest.TestCase):
             self.assertIn("%0A::error::forged", r.stdout)
             self.assertIn("rule%2Ctitle=bad", r.stdout)
             self.assertIn("line=1,", r.stdout)
+            summary = (root / "summary").read_text()
+            self.assertNotIn("\n::error::forged", summary)
+            self.assertIn(r"\[HIGH\]", summary)
 
     @unittest.skipUnless(len(BLOCKS) == 2, "no template preparation")
     def test_templates_and_helpers(self):
@@ -45,4 +48,3 @@ class SkillContract(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

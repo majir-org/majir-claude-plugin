@@ -72,12 +72,19 @@ jobs:
           def command_property(value):
               return command_data(value).replace(":", "%3A").replace(",", "%2C")
 
+          def markdown_text(value):
+              import html
+              import re
+              text = " ".join(str(value).split())
+              text = re.sub(r"[\x00-\x1f\x7f\u202a-\u202e\u2066-\u2069]", "", text)
+              return re.sub(r"([\\\x60*_{}\[\]()#+.!|>~-])", r"\\\1", html.escape(text))
+
           lines = ["## Agent skill scan (advisory)", "", f"Skills scanned: {len(results)}", f"Findings: {len(findings)}", ""]
           annotated = 0
           for severity, finding, location in findings:
               line = finding.get("line_number") or 1
               title = finding.get("title") or finding.get("rule_id") or "finding"
-              lines.append(f"- [{severity}] `{location}:{line}` {finding.get('rule_id')}: {title}")
+              lines.append("- " + markdown_text(f"[{severity}] {location}:{line} {finding.get('rule_id')}: {title}"))
               # Annotate at most 20 Critical/High findings; the job summary lists all.
               if severity in {"CRITICAL", "HIGH"} and annotated < 20:
                   annotated += 1
