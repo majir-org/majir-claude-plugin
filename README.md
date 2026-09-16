@@ -26,3 +26,10 @@ Majir uses OAuth through the hosted MCP server. Personal saved-money tools requi
 ## Documentation
 
 See `https://developers.majir.shop/mcp`.
+
+## Skill scan validation
+
+PRs scan skills with local analyzers. Findings are advisory, but incomplete
+scans fail: every skill must have one result, with no skipped skills, failed
+analyzers, or unscanned content. Files above the pinned scanner's 10 MiB
+per-file limit also fail validation.
