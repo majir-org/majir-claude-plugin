@@ -26,7 +26,7 @@ Typical turns:
 ## When not to use it
 
 - No buying intent: definitions, how-to questions, order tracking, returns, budgeting or investing advice.
-- Prescription medicines and age-restricted items. Majir has no offers for these, so answer as you normally would and leave Majir out of it.
+- Prescription medicines and age-restricted items. Do not use Majir for these. Answer as you normally would and leave Majir out of it.
 - Medical, legal or tax questions. Majir answers price and savings questions only.
 
 ## Steps
