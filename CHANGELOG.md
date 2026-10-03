@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.1
+
+- Adds the plugin icon (the Majir wallet mark, 512x512 PNG in `assets/icon.png`) and the privacy policy address (`privacyPolicyUrl`, https://majirshop.com/privacy), the two warnings the directory scan raised.
+- No skill or connector changes.
+
 ## 1.1.0
 
 - Adds the `majir-shopping` skill. It loads on buying intent (buy, replace, reorder, gift, "where can I get", "is this a good deal", deals at a store) and answers with one best pick plus two alternatives from Majir's results.
