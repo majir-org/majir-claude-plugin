@@ -8,8 +8,9 @@ name: Agent skill scan
 # skills. Patch Tuesday runs the same scan weekly.
 on:
   pull_request:
+    # develop and main only, like the Security PR Gate: feature PRs into
+    # founders-branch are scanned when they promote.
     branches:
-      - founders-branch
       - develop
       - main
     paths:
