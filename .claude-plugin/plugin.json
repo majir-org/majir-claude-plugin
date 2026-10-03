@@ -1,7 +1,8 @@
 {
   "name": "majir",
-  "version": "1.0.1",
-  "description": "Find money you already have with Majir current deals and saved offers.",
+  "displayName": "Majir",
+  "version": "1.1.0",
+  "description": "Compare products and savings with Claude. Majir helps choose a best pick and up to two alternatives from available store listings, coupons and cashback. Sign-in adds saved inbox offers. Majir never buys anything.",
   "author": {
     "name": "Majir Inc.",
     "url": "https://majirshop.com"
@@ -11,9 +12,14 @@
   "license": "MIT",
   "keywords": [
     "mcp",
-    "savings",
-    "offers",
+    "shopping",
+    "deals",
+    "coupons",
     "promo-codes",
-    "cashback"
+    "cashback",
+    "offers",
+    "price-check",
+    "gifts",
+    "savings"
   ]
 }
