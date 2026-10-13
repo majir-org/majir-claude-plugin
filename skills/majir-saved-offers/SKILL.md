@@ -1,6 +1,6 @@
 ---
 name: majir-saved-offers
-description: Review and use the offers Majir already found in the person's connected inbox, such as coupons, promo codes, store credits, gift cards, cashback and rewards. Use when the person asks what deals or credits they have, what expires soon, whether they have an offer for a store or item, wants to use a saved offer and needs its link or code, or asks about their Majir account, plan, daily lookups or connected inboxes. Needs the Majir connector signed in.
+description: Review and use the offers Majir already found in the person's connected inbox, such as coupons, promo codes, store credits, gift cards, cashback and rewards. Use when the person asks what deals or credits they have, what expires soon, whether they have an offer for a store or item, wants to use a saved offer and needs its link or code, or asks about their Majir account, daily lookups or connected inboxes. Needs the Majir connector signed in.
 license: MIT
 ---
 
@@ -14,7 +14,7 @@ These are the offers Majir found in the inboxes the person connected: coupons, p
 - `search_my_offers`: "do I have a deal for this?" by store, product, category or keyword. Strong matches rank first; `match_strength` marks loose ones and `next_step` says when to check store deals with `search_offers` instead.
 - `get_my_offer`: one offer's details: value, `coupon_code`, `minimum_spend`, start and expiry dates, `link_status`, and when the source email was sent.
 - `redeem_my_offer`: the tracked shopping link for one chosen offer. Call it only after the person picks that offer and asks to use it or get its link.
-- `get_my_account`: plan, connected inboxes, latest scan status and remaining daily lookups. `manage_inboxes_url` is where the person connects an inbox on the web.
+- `get_my_account`: connected inboxes, latest scan status and remaining daily lookups. `manage_inboxes_url` is where the person connects an inbox on the web.
 
 ## How to answer
 
