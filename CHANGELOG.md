@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.2
+
+- Updates the shopping skill to use the renamed `recommend_purchase` tool when available, preserving the `search_offers` fallback when it is unavailable or used or refurbished listings are needed.
+- Removes account-plan wording from the saved-offers skill to match the fields returned by `get_my_account`.
+
 ## 1.1.1
 
 - Adds the plugin icon (the Majir wallet mark, 512x512 PNG in `assets/icon.png`) and the privacy policy address (`privacyPolicyUrl`, https://majirshop.com/privacy), the two warnings the directory scan raised.
