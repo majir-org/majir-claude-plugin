@@ -1,6 +1,6 @@
 ---
 name: majir-saved-offers
-description: Review and use the offers Majir already found in the person's connected inbox, such as coupons, promo codes, store credits, gift cards, cashback and rewards. Use when the person asks what deals or credits they have, what expires soon, whether they have an offer for a store or item, wants to use a saved offer and needs its link or code, or asks about their Majir account, daily lookups or connected inboxes. Needs the Majir connector signed in.
+description: Review and use the offers Majir already found in the person's connected inbox, such as coupons, promo codes, store credits, gift cards, cashback and rewards. Use when the person asks what deals or credits they have, what expires soon, whether they have an offer for a store or item, wants the link or code for a saved offer, or asks about their Majir account or connected inboxes.
 license: MIT
 ---
 

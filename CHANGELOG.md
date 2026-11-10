@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.4
+
+- Shortens both skill descriptions (shopping from 817 to 552 characters, saved offers from 445 to 380). In eval runs the same skills loaded for the same requests before and after.
+- Shopping skill: an alternative is always a product, never a code on its own, and no price is worked out after a code unless the returned terms establish that the code applies to that product. Before this change, eval runs showed an estimated "price after code" in 5 of 19 answers. After it, 0 of 9.
+- No connector changes.
+
 ## 1.1.3
 
 - Removes the CI helper script `.github/scripts/test_skill_scan.py`. The Claude plugin directory accepts script files only from Verified organizations, and it refused version 1.1.2 for this file. The agent skill scan still runs on pull requests; only its self-test is gone.

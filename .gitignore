@@ -19,3 +19,6 @@ tmp/
 
 # Claude plugin package artifacts
 *.claude-plugin.zip
+
+# The eval suite is kept in a private repository
+evals/
