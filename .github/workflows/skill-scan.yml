@@ -17,7 +17,6 @@ on:
       - ".claude-plugin/**"
       - ".mcp.json"
       - ".github/workflows/skill-scan.yml"
-      - ".github/scripts/test_skill_scan.py"
 
 permissions:
   contents: read
@@ -37,7 +36,6 @@ jobs:
 
       - name: Install Skill Scanner
         run: |
-          python .github/scripts/test_skill_scan.py
           python -m pip install --disable-pip-version-check --quiet "cisco-ai-skill-scanner==2.1.0"
 
       - name: Scan agent skills

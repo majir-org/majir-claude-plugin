@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.3
+
+- Removes the CI helper script `.github/scripts/test_skill_scan.py`. The Claude plugin directory accepts script files only from Verified organizations, and it refused version 1.1.2 for this file. The agent skill scan still runs on pull requests; only its self-test is gone.
+- Adds the three links the directory reads for the plugin's listing: terms of service (`termsOfServiceUrl`), documentation (`documentationUrl`) and support (`supportUrl`). The listing showed no value for them.
+- No skill or connector changes.
+
 ## 1.1.2
 
 - Updates the shopping skill to use the renamed `recommend_purchase` tool when available, preserving the `search_offers` fallback when it is unavailable or used or refurbished listings are needed.

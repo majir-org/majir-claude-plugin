@@ -1,7 +1,7 @@
 {
   "name": "majir",
   "displayName": "Majir",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "Compare products and savings with Claude. Majir helps choose a best pick and up to two alternatives from available store listings, coupons and cashback. Sign-in adds saved inbox offers. Majir never buys anything.",
   "author": {
     "name": "Majir Inc.",
@@ -9,6 +9,9 @@
   },
   "homepage": "https://developers.majir.shop/mcp",
   "privacyPolicyUrl": "https://majirshop.com/privacy",
+  "termsOfServiceUrl": "https://majirshop.com/terms",
+  "documentationUrl": "https://developers.majir.shop/docs",
+  "supportUrl": "https://majirshop.com/support",
   "repository": "https://github.com/majir-org/majir-claude-plugin",
   "license": "MIT",
   "icon": "./assets/icon.png",
