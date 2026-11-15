@@ -3,7 +3,7 @@ name: Workflow Dependency Lock
 on:
   pull_request:
     branches: [founders-branch, develop, main]
-    types: [opened, synchronize, reopened, ready_for_review]
+    types: [opened, synchronize, reopened, ready_for_review, edited]
   push:
     branches: [founders-branch]
     paths:
