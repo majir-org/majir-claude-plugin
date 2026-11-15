@@ -5,3 +5,4 @@
 # Review all workflow inputs, including reusable-call pins and update policy.
 /.github/workflows/ @max-eichie @FearGod-majir
 /.github/dependabot.yml @max-eichie @FearGod-majir
+/.github/CODEOWNERS @max-eichie @FearGod-majir
