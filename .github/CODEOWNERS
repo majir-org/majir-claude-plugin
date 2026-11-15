@@ -1,0 +1,3 @@
+/.github/workflows/actions.lock @max-eichie @FearGod-majir
+/.github/workflows/workflow-lock.yml @max-eichie @FearGod-majir
+/.github/scripts/verify-actions-lock.sh @max-eichie @FearGod-majir
