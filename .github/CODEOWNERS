@@ -1,0 +1,8 @@
+/.github/workflows/actions.lock @max-eichie @FearGod-majir
+/.github/workflows/workflow-lock.yml @max-eichie @FearGod-majir
+/.github/scripts/verify-actions-lock.sh @max-eichie @FearGod-majir
+
+# Review all workflow inputs, including reusable-call pins and update policy.
+/.github/workflows/ @max-eichie @FearGod-majir
+/.github/dependabot.yml @max-eichie @FearGod-majir
+/.github/CODEOWNERS @max-eichie @FearGod-majir

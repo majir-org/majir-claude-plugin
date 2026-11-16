@@ -1,0 +1,52 @@
+name: Workflow Dependency Lock
+
+on:
+  pull_request:
+    branches: [founders-branch, develop, main]
+    types: [opened, synchronize, reopened, ready_for_review, edited]
+  push:
+    branches: [founders-branch]
+    paths:
+      - .github/workflows/**
+      - '**/action.yml'
+      - '**/action.yaml'
+      - .github/scripts/verify-actions-lock.sh
+      - .github/dependabot.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: workflow-lock-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  workflow-lock:
+    name: workflow-lock
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - name: Verify all workflow dependencies and provenance
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          # Always publish this required check; avoid network verification on
+          # application-only PRs whose dependency inputs match the target.
+          if [ "$EVENT_NAME" = pull_request ]; then
+            [[ "$PR_BASE_SHA" =~ ^[a-f0-9]{40}$ ]]
+            if git cat-file -e "$PR_BASE_SHA^{commit}" 2>/dev/null &&
+              git diff --quiet "$PR_BASE_SHA" HEAD -- .github/workflows ':(glob)**/action.yml' ':(glob)**/action.yaml' .github/scripts/verify-actions-lock.sh .github/dependabot.yml; then
+              echo 'Workflow dependency inputs unchanged from target branch.'
+              exit 0
+            fi
+          fi
+          bash .github/scripts/verify-actions-lock.sh
