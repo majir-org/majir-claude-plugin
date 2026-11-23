@@ -6,14 +6,6 @@ on:
       - founders-branch
       - develop
       - main
-    paths:
-      - ".gitignore"
-      - ".github/workflows/security-hygiene.yml"
-      - ".claude-plugin/**"
-      - ".mcp.json"
-      - "skills/**"
-      - "README.md"
-      - "SECURITY.md"
   push:
     tags:
       - "majir--v*"
@@ -46,6 +38,78 @@ jobs:
             git check-ignore -v --no-index .env.example || true
             exit 1
           fi
+
+      - name: Check directory compliance and manifest sync
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          import re
+          import subprocess
+          import sys
+          from pathlib import Path
+
+          stage_lines = subprocess.check_output(["git", "ls-files", "--stage", "-z"]).decode("utf-8", "replace").split("\x00")
+          entries = []
+          for raw in stage_lines:
+              if not raw:
+                  continue
+              meta, rel = raw.split("\t", 1)
+              mode = meta.split(" ", 1)[0]
+              entries.append((mode, rel))
+
+          allowed_exact = {"LICENSE", ".gitignore", ".github/CODEOWNERS", ".github/workflows/actions.lock"}
+          allowed_exts = {".md", ".json", ".yml", ".yaml", ".png"}
+          script_dir_re = re.compile(r"(^|/)(scripts|\.github/scripts)/")
+          bad_files = []
+          for mode, rel in entries:
+              p = Path(rel)
+              reason = None
+              if script_dir_re.search(rel):
+                  reason = "forbidden scripts directory"
+              elif mode == "120000":
+                  reason = "symlink not allowed"
+              elif mode == "100755":
+                  reason = "executable git mode 100755"
+              elif rel not in allowed_exact and p.suffix.lower() not in allowed_exts:
+                  reason = f"disallowed file type ({p.suffix or 'no extension'})"
+              elif p.is_file():
+                  with p.open("rb") as fh:
+                      if fh.read(2) == b"#!":
+                          reason = "shebang header"
+              if reason:
+                  bad_files.append(f"{rel} ({reason})")
+          if bad_files:
+              print("::error::Tracked file(s) violate Claude directory policy for unverified orgs:", bad_files, file=sys.stderr)
+              sys.exit(1)
+
+          manifest = json.loads(Path(".claude-plugin/plugin.json").read_text(encoding="utf-8"))
+          plugin_ver = manifest.get("version")
+          changelog_lines = Path("CHANGELOG.md").read_text(encoding="utf-8").splitlines()
+          first_h2 = next((line.strip() for line in changelog_lines if re.match(r"^##(?:\s|$)", line.lstrip())), None)
+          m = re.match(r"^##\s+\[?([0-9]+\.[0-9]+\.[0-9]+)\]?(?:\s|$)", first_h2 or "")
+          top_ver = m.group(1) if m else None
+          if not plugin_ver or plugin_ver != top_ver:
+              print(f"::error::plugin.json version ({plugin_ver}) does not match first CHANGELOG release heading ({first_h2})", file=sys.stderr)
+              sys.exit(1)
+
+          retired = ("propose_best_move", "majir-savings", "majir-redemption")
+          text_ext_re = re.compile(r"\.(md|txt|json|yml|yaml)$", re.IGNORECASE)
+          for _, rel in entries:
+              if rel == "README.md" or (rel.startswith("skills/") and text_ext_re.search(rel)):
+                  body = Path(rel).read_text(encoding="utf-8")
+                  hits = [term for term in retired if term in body]
+                  if hits:
+                      print(f"::error::{rel} contains retired references: {hits}", file=sys.stderr)
+                      sys.exit(1)
+
+          mcp = json.loads(Path(".mcp.json").read_text(encoding="utf-8"))
+          if mcp.get("mcpServers", {}).get("majir", {}).get("url") != "https://mcp.majir.shop/mcp":
+              print("::error::.mcp.json must point to https://mcp.majir.shop/mcp", file=sys.stderr)
+              sys.exit(1)
+
+          print(f"Compliance check passed: {len(entries)} tracked files, version {plugin_ver}, zero script files.")
+          PY
 
       - name: Check release tag is signed
         if: startsWith(github.ref, 'refs/tags/majir--v')

@@ -4,6 +4,9 @@
 
 - Shortens both skill descriptions (shopping from 817 to 552 characters, saved offers from 445 to 380). In eval runs the same skills loaded for the same requests before and after.
 - Shopping skill: an alternative is always a product, never a code on its own, and no price is worked out after a code unless the returned terms establish that the code applies to that product. Before this change, eval runs showed an estimated "price after code" in 5 of 19 answers. After it, 0 of 9.
+- Shopping skill: calls `search_my_offers` consistently with optional sign-in, and routes saved-offer detail lookups through `get_my_offer` alongside `get_offer`.
+- Saved-offers skill: calls `get_my_account` only when signed in, avoiding an unnecessary auth prompt when `list_my_offers` returns a signed-out note.
+- CI compliance: moves lock verification inline in `.github/workflows/workflow-lock.yml`, removes `.github/scripts/verify-actions-lock.sh` for Claude directory compliance, and adds an inline script/version guard in `.github/workflows/security-hygiene.yml`.
 - No connector changes.
 
 ## 1.1.3
