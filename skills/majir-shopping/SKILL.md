@@ -53,9 +53,9 @@ Check the returned `objective` against the person's stated goal. This tool has n
 If `recommend_purchase` is not listed, or the request needs used or refurbished listings, call `search_offers`:
 
 - For products, pass the product words in `query`, `max_price` for a USD budget, and `condition` (`new`, `used` or `refurbished`) when stated. These price and condition filters exclude catalog promotions. Use `merchant` only for a search of that store's catalog promotions; it disables live product listings. For a product at a named store, search without `merchant` and keep only returned listings whose seller matches that store. If none match, say this search found no matching listing. Do not claim the store has no stock. Check catalog promotions separately without price or condition filters when they are needed for the comparison.
-- When the person is signed in, also call `search_my_offers` with the same query and weigh both. An empty saved-offer result is not the answer on its own.
+- Also call `search_my_offers` with the same query (when signed out it returns only a sign-in note without blocking the answer) and weigh both. An empty or signed-out saved-offer result is not the answer on its own.
 - Results mix two kinds of row. A live store listing has a `price`, `availability`, `condition`, `seller_domain` and a `tracked_link`, and may carry `image_url` and `specs` (`dimensions`, `size`, `material`, `color`) when the store states them. A catalog deal has a `coupon_code`, `savings_percent` or `savings_amount`, `minimum_spend`, and `expires_at` with `expiry_basis`.
-- When the person picks one result and wants the details, or a result looks stale, call `get_offer` with that result's `id` for its current price and stock.
+- When the person picks one result and wants the details, or a result looks stale, call `get_offer` for a store listing or catalog deal, or `get_my_offer` (when signed in) for one of their saved offers, passing that result's `id`.
 
 ### 3. Check the fit yourself
 
